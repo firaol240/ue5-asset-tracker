@@ -1,0 +1,15 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "c:\\users\\firao\\documents\\unreal projects\\myproject2\\plugins\\ue5assettracker\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\ue5assettracker\\module.ue5assettracker.cpp",
+        "ProvidedModule": "",
+        "PCH": "c:\\users\\firao\\documents\\unreal projects\\myproject2\\intermediate\\build\\win64\\x64\\myproject2editor\\development\\unrealed\\sharedpch.unrealed.cpp20.h.pch",
+        "Includes": [
+            "c:\\users\\firao\\documents\\unreal projects\\myproject2\\plugins\\ue5assettracker\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\ue5assettracker\\definitions.ue5assettracker.h",
+            "c:\\users\\firao\\documents\\unreal projects\\myproject2\\plugins\\ue5assettracker\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\ue5assettracker\\permoduleinline.gen.cpp",
+            "c:\\program files\\epic games\\ue_5.7\\engine\\source\\runtime\\core\\public\\hal\\permoduleinline.inl"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}
