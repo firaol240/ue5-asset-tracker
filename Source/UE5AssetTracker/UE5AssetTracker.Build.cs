@@ -45,7 +45,12 @@ public class UE5AssetTracker : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
-				"AssetRegistry"
+				"AssetRegistry",
+				"HorizontalBox",
+				"UMG",
+				"UMGEditor",
+				"ContentBrowser",
+				"LevelEditor"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);
