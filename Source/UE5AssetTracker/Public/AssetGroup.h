@@ -1,8 +1,10 @@
 #pragma once
 
+#include "CoreMinimal.h"
+#include "AssetRegistry/AssetData.h"
 
 struct FAssetGroup {
-    FString Name;
+    FString GroupName;
     FString Author;
     FString License;
 

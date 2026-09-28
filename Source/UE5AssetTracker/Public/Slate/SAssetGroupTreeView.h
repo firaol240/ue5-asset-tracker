@@ -4,6 +4,7 @@
 #include "Widgets/SCompoundWidget.h"
 #include "Widgets/Views/STreeView.h"
 #include "AssetRegistry/AssetData.h"
+#include "AssetGroup.h"
 
 enum class EAssetTreeNodeType {
     Group,
@@ -19,11 +20,11 @@ struct FAssetTreeNode {
 
     TArray<TSharedPtr<FAssetTreeNode>> Children;
 
-    EAssetTreeNodeType NodeType;
+    EAssetTreeNodeType NodeType = EAssetTreeNodeType::Group;
     typedef TSharedPtr<FAssetTreeNode> FAssetTreeNodePtr;
 };
 
-class UE5AssetTracker_API SAssetGroupTreeView : public SCompoundWidget {
+class UE5ASSETTRACKER_API SAssetGroupTreeView : public SCompoundWidget {
     public:
         SLATE_BEGIN_ARGS(SAssetGroupTreeView) {}
         SLATE_END_ARGS()
@@ -35,9 +36,9 @@ class UE5AssetTracker_API SAssetGroupTreeView : public SCompoundWidget {
     private:
         TSharedRef<ITableRow> OnGenerateRow(FAssetTreeNode::FAssetTreeNodePtr Item, const TSharedRef<STableViewBase>& OwnerTable);
         void OnGetChildren(FAssetTreeNode::FAssetTreeNodePtr Item, TArray<FAssetTreeNode::FAssetTreeNodePtr>& OutChildren);
-        void OnMouseDoubleClick(FAssetTreeNode::FAssetTreeNodePtr clickedItem);
+        void OnTreeItemDoubleClicked(FAssetTreeNode::FAssetTreeNodePtr clickedItem);
 
     private:
         TArray<FAssetTreeNode::FAssetTreeNodePtr> RootNodes;
         TSharedPtr<STreeView<FAssetTreeNode::FAssetTreeNodePtr>> TreeView;
-}
+};

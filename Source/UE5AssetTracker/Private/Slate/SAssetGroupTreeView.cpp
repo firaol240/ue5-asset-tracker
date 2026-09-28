@@ -1,6 +1,9 @@
 #include "Slate/SAssetGroupTreeView.h"
 #include "Widgets/Views/SHeaderRow.h"
 #include "Widgets/Views/SMultiColumnTableRow.h"
+#include "Widgets/Views/SExpanderArrow.h"
+#include "Widgets/Text/STextBlock.h"
+#include "Widgets/SBoxPanel.h"
 #include "ContentBrowserModule.h"
 #include "IContentBrowserSingleton.h"
 
@@ -19,7 +22,7 @@ class STreeAssetRow : public SMultiColumnTableRow<FAssetTreeNode::FAssetTreeNode
                 if(ColumnName == "Name") {
                     return SNew(SHorizontalBox)
                     + SHorizontalBox::Slot().AutoWidth()[SNew(SExpanderArrow, SharedThis(this))]
-                    + SHorizontalBox::Slot().VAlign_Center(VAlign_Center)
+                    + SHorizontalBox::Slot().VAlign(VAlign_Center)
                     [  
                         SNew(STextBlock)
                         .Text(FText::FromString(ItemData->GroupName))
@@ -28,9 +31,21 @@ class STreeAssetRow : public SMultiColumnTableRow<FAssetTreeNode::FAssetTreeNode
                 } else if(ColumnName == "Author") {
                     return SNew(STextBlock).Text(FText::FromString(ItemData->Author));
                 } else if(ColumnName == "License") {
-                    return SNew(STextBlock.Text(FText::FromString(ItemData->License)));
+                    return SNew(STextBlock).Text(FText::FromString(ItemData->License));
+                }
+            } else {
+                if(ColumnName == "Name") {
+                    return SNew(SHorizontalBox) 
+                    + SHorizontalBox::Slot().AutoWidth()[SNew(SExpanderArrow, SharedThis(this))]
+                    + SHorizontalBox::Slot().VAlign(VAlign_Center)
+                    [  
+                        SNew(STextBlock)
+                        .Text(FText::FromName(ItemData->AssetData.AssetName))
+                    ];
                 }
             }
+
+            return SNullWidget::NullWidget;
         }
  
     private: 
@@ -46,7 +61,7 @@ class STreeAssetRow : public SMultiColumnTableRow<FAssetTreeNode::FAssetTreeNode
             .TreeItemsSource(&RootNodes)
             .OnGenerateRow(this, &SAssetGroupTreeView::OnGenerateRow)
             .OnGetChildren(this, &SAssetGroupTreeView::OnGetChildren)
-            .OnMouseDoubleClick(this, &SAssetGroupTreeView::OnMouseDoubleClick)
+            .OnMouseButtonDoubleClick(this, &SAssetGroupTreeView::OnTreeItemDoubleClicked)
             .HeaderRow
             (
                 SNew(SHeaderRow)
@@ -83,17 +98,17 @@ class STreeAssetRow : public SMultiColumnTableRow<FAssetTreeNode::FAssetTreeNode
         }
     }
 
-    TSharedRef<ITableRow> SAssetGroupTreeView::OnGenerateRow(FAssetTreeNode::Ptr ItemData, const TSharedRef<STableViewBase>& OwnerTable) {
+    TSharedRef<ITableRow> SAssetGroupTreeView::OnGenerateRow(FAssetTreeNode::FAssetTreeNodePtr ItemData, const TSharedRef<STableViewBase>& OwnerTable) {
         return SNew(STreeAssetRow, OwnerTable, ItemData);
     }
 
-    void SAssetGroupTreeView::OnGetChildren(FAssetTreeNode::Ptr ItemData, TArray<FAssetTreeNode::Ptr>& OutChildren) {
-        if(ItemData.isValid()) {
+    void SAssetGroupTreeView::OnGetChildren(FAssetTreeNode::FAssetTreeNodePtr ItemData, TArray<FAssetTreeNode::FAssetTreeNodePtr>& OutChildren) {
+        if(ItemData.IsValid()) {
             OutChildren = ItemData->Children;
         }
     }
 
-    oid SAssetGroupTreeView::OnTreeItemDoubleClicked(FAssetTreeNode::Ptr ClickedItem)
+    void SAssetGroupTreeView::OnTreeItemDoubleClicked(FAssetTreeNode::FAssetTreeNodePtr ClickedItem)
 {
     if (!ClickedItem.IsValid())
     {
