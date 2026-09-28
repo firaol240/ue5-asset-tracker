@@ -5,12 +5,13 @@
 #include "UE5AssetTrackerCommands.h"
 #include "LevelEditor.h"
 #include "Widgets/Docking/SDockTab.h"
-#include "Widgets/Layout/SBox.h"
 #include "Widgets/SBoxPanel.h"
 #include "Widgets/Text/STextBlock.h"
 #include "Widgets/Input/SButton.h"
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "ToolMenus.h"
+#include "Slate/SAssetGroupTreeView.h"
+#include "AssetGroup.h"
 
 static const FName UE5AssetTrackerTabName("UE5AssetTracker");
 
@@ -46,6 +47,8 @@ void FUE5AssetTrackerModule::ShutdownModule() {
 
 	UToolMenus::UnregisterOwner(this);
 
+	AssetTreeView.Reset();
+
 	FUE5AssetTrackerStyle::Shutdown();
 
 	FUE5AssetTrackerCommands::Unregister();
@@ -73,45 +76,20 @@ TSharedRef<SDockTab> FUE5AssetTrackerModule::OnSpawnPluginTab(const FSpawnTabArg
         [
             SNew(SButton)
             .Text(FText::FromString(TEXT("Refresh")))
-            .OnClicked_Lambda(
-                []()
-                {
-                    FAssetRegistryModule& AssetRegistryModule =
-            		FModuleManager::LoadModuleChecked<FAssetRegistryModule>(
-                	TEXT("AssetRegistry"));
-
-        			IAssetRegistry& AssetRegistry = AssetRegistryModule.Get();
-					TArray<FAssetData> Assets;
-        			AssetRegistry.GetAllAssets(Assets, true);
-
-        			UE_LOG(
-            			LogTemp,
-            			Warning,
-            			TEXT("Asset Tracker: Found %d assets"),
-            			Assets.Num()
-        			);
-        			return FReply::Handled();
-                })
+            .OnClicked_Raw(this, &FUE5AssetTrackerModule::OnRefreshClicked)
         ]
 		];
 
 	ContentBox->AddSlot()
-		.AutoHeight()
+		.FillHeight(1.0f)
 		[
-			SNew(STextBlock)
-			.Text(FText::FromString(TEXT("Empty")))
+			SAssignNew(AssetTreeView, SAssetGroupTreeView, BuildAssetGroups())
 		];
-
 
 	return SNew(SDockTab)
 		.TabRole(ETabRole::NomadTab)
 		[
-			SNew(SBox)
-			.HAlign(HAlign_Left)
-			.VAlign(VAlign_Top)
-			[
-				ContentBox
-			]
+			ContentBox
 		];
 }
 
@@ -143,6 +121,40 @@ void FUE5AssetTrackerModule::RegisterMenus()
 			}
 		}
 	}
+}
+
+TArray<FAssetGroup> FUE5AssetTrackerModule::BuildAssetGroups() const {
+    IAssetRegistry& AssetRegistry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry").Get();
+
+    FARFilter Filter;
+    Filter.PackagePaths.Add("/Game");
+    Filter.bRecursivePaths = true;
+
+    TArray<FAssetData> Assets;
+    AssetRegistry.GetAssets(Filter, Assets);
+
+    // Temporary grouping until the real data source exists: one group per top-level /Game folder
+    TMap<FString, FAssetGroup> GroupsByFolder;
+    for (const FAssetData& Asset : Assets) {
+        TArray<FString> Parts;
+        Asset.PackagePath.ToString().ParseIntoArray(Parts, TEXT("/"));
+        const FString Folder = Parts.Num() > 1 ? Parts[1] : TEXT("(root)");
+
+        FAssetGroup& Group = GroupsByFolder.FindOrAdd(Folder);
+        Group.GroupName = Folder;
+        Group.Assets.Add(Asset);
+    }
+
+    TArray<FAssetGroup> Result;
+    GroupsByFolder.GenerateValueArray(Result);
+    return Result;
+}
+
+FReply FUE5AssetTrackerModule::OnRefreshClicked() {
+    if (AssetTreeView.IsValid()) {
+        AssetTreeView->SetAssetGroups(BuildAssetGroups());
+    }
+    return FReply::Handled();
 }
 
 #undef LOCTEXT_NAMESPACE

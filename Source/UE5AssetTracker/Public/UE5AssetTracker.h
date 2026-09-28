@@ -3,9 +3,12 @@
 #pragma once
 
 #include "Modules/ModuleManager.h"
+#include "Input/Reply.h"
 
 class FToolBarBuilder;
 class FMenuBuilder;
+class SAssetGroupTreeView;
+struct FAssetGroup;
 
 class FUE5AssetTrackerModule : public IModuleInterface
 {
@@ -24,6 +27,10 @@ private:
 
 	TSharedRef<class SDockTab> OnSpawnPluginTab(const class FSpawnTabArgs& SpawnTabArgs);
 
+	TArray<FAssetGroup> BuildAssetGroups() const;
+	FReply OnRefreshClicked();
+
 private:
 	TSharedPtr<class FUICommandList> PluginCommands;
+	TSharedPtr<SAssetGroupTreeView> AssetTreeView;
 };
