@@ -1,0 +1,14 @@
+# Unreal build output
+Binaries/
+Intermediate/
+Saved/
+DerivedDataCache/
+
+# IDE
+.vscode/
+.vs/
+*.sln
+*.suo
+*.VC.db
+*.opensdf
+*.sdf
